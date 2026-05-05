@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rishav Kumar | Cybersecurity Portfolio</title>
+  <meta name="description" content="Rishav Kumar — Aspiring Cybersecurity Analyst specializing in network security, ethical hacking, and vulnerability assessment.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Global background particles -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo">
+        <span class="logo-bracket">&lt;</span>RK<span class="logo-slash"> /</span><span class="logo-bracket">&gt;</span>
+      </a>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="#hero" class="nav-link active">Home</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#skills" class="nav-link">Skills</a></li>
+        <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#certifications" class="nav-link">Certs</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <canvas class="hero-canvas" id="heroCanvas"></canvas>
+    <div class="hero-content">
+      <p class="terminal">$ whoami</p>
+      
+      <h1>
+        Rishav <span>Kumar</span>
+      </h1>
+      
+      <h2>Aspiring Cybersecurity Analyst</h2>
+      
+      <p class="subtitle">
+        I identify vulnerabilities before attackers do.
+      </p>
+  
+      <div class="buttons">
+        <a href="#projects" class="btn primary">View Projects</a>
+        <a href="#" class="btn secondary">Download Resume</a>
+      </div>
+  
+      <div class="stats">
+        <div><h3>10+</h3><p>CTFs Played</p></div>
+        <div><h3>5+</h3><p>Projects</p></div>
+        <div><h3>3+</h3><p>Certifications</p></div>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT ===== -->
+  <section class="section about" id="about">
+    <div class="container">
+      <h2 class="section-title"><span class="title-hash">#</span> About Me</h2>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>I'm <strong>Rishav Kumar</strong>, a BCA student with a passion for cybersecurity. I spend my time exploring network vulnerabilities, practicing on CTF platforms, and building hands-on security projects.</p>
+          <p>My focus areas include <span class="highlight">network security</span>, <span class="highlight">web application testing</span>, and <span class="highlight">threat analysis</span>. I believe in learning by doing — every tool I list, I've used in practice.</p>
+          <p>Currently seeking opportunities as a <strong>SOC Analyst</strong>, <strong>Cybersecurity Intern</strong>, or <strong>Ethical Hacking</strong> role where I can contribute while growing my skills in a real-world environment.</p>
+        </div>
+        <div class="about-terminal terminal-box" id="aboutTerminal">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <div class="terminal-title">guest@rishav-os:~</div>
+          </div>
+          <div class="terminal-body">
+            <div class="terminal-line">
+              <span class="prompt">guest@rishav-os:~$</span>
+              <span id="termCommand" class="term-command"></span><span class="cursor">_</span>
+            </div>
+            <div class="terminal-output" id="termOutput"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SKILLS ===== -->
+  <section class="section skills" id="skills">
+    <div class="container">
+      <h2 class="section-title"><span class="title-hash">#</span> Skills & Tools</h2>
+      <div class="skills-grid">
+        <!-- Offensive Security -->
+        <div class="skill-card" data-reveal>
+          <div class="skill-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Offensive Security</h3>
+          <div class="skill-tags">
+            <span class="tag">Nmap</span>
+            <span class="tag">Burp Suite</span>
+            <span class="tag">Metasploit</span>
+            <span class="tag">Nikto</span>
+          </div>
+        </div>
+        <!-- Network Security -->
+        <div class="skill-card" data-reveal>
+          <div class="skill-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h3>Network Security</h3>
+          <div class="skill-tags">
+            <span class="tag">Wireshark</span>
+            <span class="tag">TCP/IP</span>
+            <span class="tag">Firewalls</span>
+            <span class="tag">DNS</span>
+          </div>
+        </div>
+        <!-- OS & Scripting -->
+        <div class="skill-card" data-reveal>
+          <div class="skill-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          </div>
+          <h3>OS & Scripting</h3>
+          <div class="skill-tags">
+            <span class="tag">Kali Linux</span>
+            <span class="tag">Bash</span>
+            <span class="tag">Python</span>
+            <span class="tag">Windows</span>
+          </div>
+        </div>
+        <!-- Blue Team -->
+        <div class="skill-card" data-reveal>
+          <div class="skill-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <h3>Blue Team / SIEM</h3>
+          <div class="skill-tags">
+            <span class="tag">Splunk</span>
+            <span class="tag">Log Analysis</span>
+            <span class="tag">IDS/IPS</span>
+            <span class="tag">SIEM Basics</span>
+          </div>
+        </div>
+        <!-- Web Security -->
+        <div class="skill-card" data-reveal>
+          <div class="skill-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3>Web Security</h3>
+          <div class="skill-tags">
+            <span class="tag">OWASP Top 10</span>
+            <span class="tag">XSS</span>
+            <span class="tag">SQLi</span>
+            <span class="tag">CSRF</span>
+          </div>
+        </div>
+        <!-- CTF & Practice -->
+        <div class="skill-card" data-reveal>
+          <div class="skill-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h3>CTF & Practice</h3>
+          <div class="skill-tags">
+            <span class="tag">TryHackMe</span>
+            <span class="tag">HackTheBox</span>
+            <span class="tag">PicoCTF</span>
+            <span class="tag">OverTheWire</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROJECTS ===== -->
+  <section class="section projects" id="projects">
+    <div class="container">
+      <h2 class="section-title"><span class="title-hash">#</span> Featured Projects</h2>
+      <div class="carousel-wrapper">
+        <div class="carousel-scene">
+          <div class="carousel-ring" id="carouselRing">
+            <!-- Project 1 -->
+            <article class="project-card">
+              <div class="project-image">
+                <img src="assets/images/proj_vuln_scanner.png" alt="Vulnerability Scanner">
+              </div>
+              <div class="project-body">
+                <div class="project-number">01</div>
+                <h3 class="project-name">Network Vulnerability Scanner</h3>
+                <p class="project-desc">Built a Python-based scanner that automates Nmap scans, detects open ports, identifies running services, and generates structured vulnerability reports.</p>
+                <div class="project-tools">
+                  <span>Python</span><span>Nmap</span><span>Scapy</span><span>Linux</span>
+                </div>
+                <div class="project-links">
+                  <a href="#" class="project-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    Source Code
+                  </a>
+                  <a href="#" class="project-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Live Demo
+                  </a>
+                </div>
+              </div>
+            </article>
+            <!-- Project 2 -->
+            <article class="project-card">
+              <div class="project-image">
+                <img src="assets/images/proj_soc_dashboard.png" alt="Packet Sniffer & Analyzer">
+              </div>
+              <div class="project-body">
+                <div class="project-number">02</div>
+                <h3 class="project-name">Packet Sniffer & Analyzer</h3>
+                <p class="project-desc">Developed a real-time packet capture tool using Scapy that monitors network traffic, filters by protocol, and flags suspicious patterns for analysis.</p>
+                <div class="project-tools">
+                  <span>Python</span><span>Scapy</span><span>Wireshark</span><span>TCP/IP</span>
+                </div>
+                <div class="project-links">
+                  <a href="#" class="project-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    Source Code
+                  </a>
+                  <a href="#" class="project-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Live Demo
+                  </a>
+                </div>
+              </div>
+            </article>
+            <!-- Project 3 -->
+            <article class="project-card">
+              <div class="project-image">
+                <img src="assets/images/proj_phishing.png" alt="Web App Pentesting Lab">
+              </div>
+              <div class="project-body">
+                <div class="project-number">03</div>
+                <h3 class="project-name">Web App Pentesting Lab</h3>
+                <p class="project-desc">Set up a local pentesting environment with intentionally vulnerable apps (DVWA, Juice Shop) and documented exploits for OWASP Top 10 vulnerabilities.</p>
+                <div class="project-tools">
+                  <span>Burp Suite</span><span>DVWA</span><span>SQLi</span><span>XSS</span>
+                </div>
+                <div class="project-links">
+                  <a href="#" class="project-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    Source Code
+                  </a>
+                  <a href="#" class="project-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Write-up
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CERTIFICATIONS ===== -->
+  <section class="section certifications" id="certifications">
+    <div class="container">
+      <h2 class="section-title"><span class="title-hash">#</span> Certifications</h2>
+      <div class="certs-grid">
+        <a href="https://coursera.org/share/4c00c4055d8f2f506809b69c0a60b2df" target="_blank" class="cert-card earned" data-reveal>
+          <div class="cert-status">Earned</div>
+          <div class="cert-icon">🛡️</div>
+          <h3>Google Cybersecurity Certificate</h3>
+          <p>Google / Coursera</p>
+        </a>
+        <div class="cert-card earned" data-reveal>
+          <div class="cert-status">Earned</div>
+          <div class="cert-icon">🏴‍☠️</div>
+          <h3>TryHackMe Learning Paths</h3>
+          <p>TryHackMe</p>
+        </div>
+        <div class="cert-card in-progress" data-reveal>
+          <div class="cert-status">In Progress</div>
+          <div class="cert-icon">🔐</div>
+          <h3>CompTIA Security+</h3>
+          <p>CompTIA</p>
+        </div>
+        <div class="cert-card planned" data-reveal>
+          <div class="cert-status">Planned</div>
+          <div class="cert-icon">💉</div>
+          <h3>eJPT</h3>
+          <p>INE Security</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <h2 class="section-title"><span class="title-hash">#</span> Get In Touch</h2>
+      <p class="contact-subtitle">Interested in working together or have a question? Let's connect.</p>
+      <div class="contact-grid">
+        <a href="mailto:rishav@example.com" class="contact-card" data-reveal>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>Email</span>
+          <p>rishav@example.com</p>
+        </a>
+        <a href="https://www.linkedin.com/in/rishav-kumar-317134368" target="_blank" class="contact-card" data-reveal>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          <span>LinkedIn</span>
+          <p>Connect with me</p>
+        </a>
+        <a href="https://github.com/RishavK1811" target="_blank" class="contact-card" data-reveal>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          <span>GitHub</span>
+          <p>View my repos</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p class="footer-logo">
+          <span class="logo-bracket">&lt;</span>RK<span class="logo-slash"> /</span><span class="logo-bracket">&gt;</span>
+        </p>
+        <p class="footer-text">Designed & built by Rishav Kumar &bull; 2026</p>
+        <p class="footer-quote">"The quieter you become, the more you can hear."</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
