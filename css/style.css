@@ -240,9 +240,7 @@ img { max-width: 100%; display: block; }
   white-space: nowrap;
   width: 0;
   border-right: 2px solid var(--green);
-  animation:
-    typing 0.7s steps(8, end) 0.2s forwards,
-    caretBlink 0.75s step-end 0.2s infinite;
+  animation: typing 0.7s steps(8, end) 0.2s forwards;
 }
 
 .hero-content h1 {
