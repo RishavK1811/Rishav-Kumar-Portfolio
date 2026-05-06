@@ -24,8 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ----- Dynamic Terminal Typing Effect ----- */
   const termCommand = document.getElementById('termCommand');
   const termOutput = document.getElementById('termOutput');
+  const aboutTerminal = document.getElementById('aboutTerminal');
   
-  if (termCommand && termOutput) {
+  if (termCommand && termOutput && aboutTerminal) {
     const commands = [
       { cmd: 'whoami', out: 'Rishav - Cybersecurity Student' },
       { cmd: 'pwd', out: '/home/rishav/cybersecurity' },
@@ -38,28 +39,142 @@ document.addEventListener('DOMContentLoaded', () => {
     commands.sort(() => Math.random() - 0.5);
 
     let currentCmdIndex = 0;
-    
+    let autoTypingActive = true;
+    let typeInterval;
+    let nextCmdTimeout;
+    let resumeAutoTimeout;
+    let isWaitingForNewCommand = false;
+
+    // Create a hidden input to capture keystrokes
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'text';
+    hiddenInput.style.position = 'absolute';
+    hiddenInput.style.opacity = '0';
+    hiddenInput.style.left = '-9999px';
+    hiddenInput.setAttribute('autocomplete', 'off');
+    hiddenInput.setAttribute('autocorrect', 'off');
+    hiddenInput.setAttribute('autocapitalize', 'off');
+    hiddenInput.setAttribute('spellcheck', 'false');
+    aboutTerminal.appendChild(hiddenInput);
+
+    aboutTerminal.style.cursor = 'text';
+    aboutTerminal.addEventListener('click', () => {
+      hiddenInput.focus();
+    });
+
+    const clearAutoTyping = () => {
+      if (autoTypingActive) {
+        autoTypingActive = false;
+        clearInterval(typeInterval);
+        clearTimeout(nextCmdTimeout);
+      }
+    };
+
+    const resumeAutoTyping = () => {
+      autoTypingActive = true;
+      hiddenInput.value = '';
+      isWaitingForNewCommand = false;
+      currentCmdIndex = (currentCmdIndex + 1) % commands.length;
+      runTerminal();
+    };
+
+    const resetUserIdle = () => {
+      clearTimeout(resumeAutoTimeout);
+      resumeAutoTimeout = setTimeout(() => {
+        resumeAutoTyping();
+      }, 10000);
+    };
+
+    hiddenInput.addEventListener('keydown', (e) => {
+      if (autoTypingActive) {
+        clearAutoTyping();
+        termCommand.textContent = '';
+        termOutput.textContent = '';
+        hiddenInput.value = '';
+      }
+      resetUserIdle();
+      
+      if (isWaitingForNewCommand && e.key !== 'Enter') {
+        termCommand.textContent = '';
+        termOutput.textContent = '';
+        isWaitingForNewCommand = false;
+      }
+
+      if (e.key === 'Enter') {
+        const val = hiddenInput.value.trim();
+        if (val) {
+          const found = commands.find(c => c.cmd.toLowerCase() === val.toLowerCase());
+          if (found) {
+            termOutput.textContent = found.out;
+          } else if (val.toLowerCase() === 'clear') {
+            termCommand.textContent = '';
+            termOutput.textContent = '';
+          } else if (val.toLowerCase() === 'help') {
+            termOutput.textContent = 'Available commands: ' + commands.map(c => c.cmd).join(', ') + ', clear, help';
+          } else {
+            termOutput.textContent = `bash: ${val}: command not found`;
+          }
+        } else {
+          termCommand.textContent = '';
+          termOutput.textContent = '';
+        }
+        
+        hiddenInput.value = '';
+        isWaitingForNewCommand = true;
+      }
+    });
+
+    hiddenInput.addEventListener('input', (e) => {
+      if (autoTypingActive) {
+        clearAutoTyping();
+        termCommand.textContent = '';
+        termOutput.textContent = '';
+      }
+      resetUserIdle();
+      
+      if (isWaitingForNewCommand) {
+        termOutput.textContent = '';
+        isWaitingForNewCommand = false;
+      }
+      
+      termCommand.textContent = hiddenInput.value;
+    });
+
     const typeCommand = (text, output, callback) => {
+      if (!autoTypingActive) return;
       let charIndex = 0;
       termCommand.textContent = '';
       termOutput.textContent = '';
+      isWaitingForNewCommand = false;
       
-      const typeInterval = setInterval(() => {
+      typeInterval = setInterval(() => {
+        if (!autoTypingActive) {
+          clearInterval(typeInterval);
+          return;
+        }
         termCommand.textContent += text.charAt(charIndex);
         charIndex++;
         if (charIndex >= text.length) {
           clearInterval(typeInterval);
-          setTimeout(() => {
+          nextCmdTimeout = setTimeout(() => {
+            if (!autoTypingActive) return;
             termOutput.textContent = output;
-            if (callback) setTimeout(callback, 4000); // Wait 4 seconds before next
-          }, 300); // slight delay before output appears
+            if (callback) {
+              nextCmdTimeout = setTimeout(() => {
+                if (!autoTypingActive) return;
+                callback();
+              }, 4000);
+            }
+          }, 300);
         }
-      }, 60); // typing speed
+      }, 60);
     };
 
     const runTerminal = () => {
+      if (!autoTypingActive) return;
       const current = commands[currentCmdIndex];
       typeCommand(current.cmd, current.out, () => {
+        if (!autoTypingActive) return;
         currentCmdIndex = (currentCmdIndex + 1) % commands.length;
         runTerminal();
       });
@@ -147,75 +262,108 @@ document.addEventListener('DOMContentLoaded', () => {
 
   statNumbers.forEach(el => statObserver.observe(el));
 
-  /* ----- Hero background particles (canvas) ----- */
+  /* ----- Hero Canvas - GREEN PARTICLE HACKER EFFECT ----- */
   const canvas = document.getElementById('heroCanvas');
-  if (canvas) {
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    let mouse = { x: -1000, y: -1000 };
+  const image = document.getElementById('hackerImage');
+
+  if (canvas && image) {
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    let particlesArray = [];
     let animFrame;
 
+    let mouse = { x: null, y: null, radius: 100 };
+
     const resize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
+      canvas.width  = canvas.parentElement.offsetWidth;
+      canvas.height = canvas.parentElement.offsetHeight;
     };
 
     class Particle {
-      constructor() {
-        this.reset();
-      }
-      reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 1.5 + 0.5;
-        this.speedX = (Math.random() - 0.5) * 0.3;
-        this.speedY = (Math.random() - 0.5) * 0.3;
-        this.opacity = Math.random() * 0.4 + 0.1;
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        // Mouse interaction
-        const dx = mouse.x - this.x;
-        const dy = mouse.y - this.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          this.x -= dx * 0.01;
-          this.y -= dy * 0.01;
-          this.opacity = Math.min(0.8, this.opacity + 0.02);
-        }
-
-        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-          this.reset();
-        }
+      constructor(x, y, brightness) {
+        this.baseX   = x;
+        this.baseY   = y;
+        // Start directly at base position — no assembly animation
+        this.x       = x;
+        this.y       = y;
+        this.density = (Math.random() * 25) + 5;
+        // Size based on brightness — making dots slightly smaller for a cleaner look
+        this.size    = Math.random() * 1.0 + (brightness / 255) * 0.8;
+        // Keep the neon-green palette, vary opacity slightly for depth
+        const alpha  = 0.4 + (brightness / 255) * 0.6;
+        this.color   = `rgba(0, 255, 100, ${alpha.toFixed(2)})`;
+        // Glow intensity based on brightness
+        this.glowSize = this.size * 2 + (brightness / 255) * 3;
+        this.glowAlpha = alpha * 0.35;
       }
       draw() {
+        // Outer glow
+        ctx.shadowColor = 'rgba(0, 255, 100, 0.6)';
+        ctx.shadowBlur = this.glowSize;
+        ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 255, 136, ${this.opacity})`;
+        ctx.closePath();
         ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      update() {
+        // Mouse repulsion
+        if (mouse.x !== null) {
+          const dx   = mouse.x - this.x;
+          const dy   = mouse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouse.radius) {
+            const force = (mouse.radius - dist) / mouse.radius;
+            const fx    = (dx / dist) * force * this.density;
+            const fy    = (dy / dist) * force * this.density;
+            this.x -= fx;
+            this.y -= fy;
+          }
+        }
+        // Ease back to base position
+        this.x += (this.baseX - this.x) * 0.07;
+        this.y += (this.baseY - this.y) * 0.07;
       }
     }
 
     const initParticles = () => {
-      const count = Math.min(80, Math.floor((canvas.width * canvas.height) / 12000));
-      particles = Array.from({ length: count }, () => new Particle());
-    };
+      particlesArray = [];
 
-    const drawConnections = () => {
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 100) {
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(0, 255, 136, ${0.05 * (1 - dist / 100)})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
+      // Image sizing: fit height to canvas, position right-side on desktop
+      const isMobile  = canvas.width < 768;
+      const imgHeight = isMobile ? canvas.height * 0.65 : canvas.height * 0.92;
+      const imgWidth  = imgHeight * (image.naturalWidth / image.naturalHeight);
+
+      const posX = isMobile
+        ? (canvas.width  - imgWidth)  / 2
+        : canvas.width  - imgWidth - 20;
+      const posY = isMobile
+        ? canvas.height - imgHeight + 20
+        : (canvas.height - imgHeight) / 2;
+
+      // Draw image to canvas to sample pixels
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, posX, posY, imgWidth, imgHeight);
+
+      const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // gap=7 → very high gap for minimalist, clean dot-art effect
+      const gap = isMobile ? 7 : 6;
+
+      for (let y = 0; y < canvas.height; y += gap) {
+        for (let x = 0; x < canvas.width; x += gap) {
+          const idx   = (y * canvas.width + x) * 4;
+          const r     = pixels.data[idx];
+          const g     = pixels.data[idx + 1];
+          const b     = pixels.data[idx + 2];
+          const alpha = pixels.data[idx + 3];
+
+          // Image is green on pure black — any non-black pixel is part of the figure
+          const brightness = (r + g + b) / 3;
+          // Increased thresholds to show only the most prominent/brightest dots
+          if (alpha > 60 && brightness > 50) {
+            particlesArray.push(new Particle(x, y, Math.max(g, brightness)));
           }
         }
       }
@@ -223,35 +371,69 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => { p.update(); p.draw(); });
-      drawConnections();
+      for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].draw();
+        particlesArray[i].update();
+      }
       animFrame = requestAnimationFrame(animate);
     };
 
-    // Only animate when hero is visible
+    const setupCanvas = () => {
+      resize();
+      initParticles();
+      if (!animFrame) animate();
+    };
+
+    // Wait for image to load
+    if (image.complete && image.naturalWidth > 0) {
+      setupCanvas();
+    } else {
+      image.addEventListener('load', setupCanvas);
+    }
+
+    // Pause when hero is out of view (CPU saving)
     const heroObserver = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting) {
-        animate();
+        if (!animFrame) animate();
       } else {
         cancelAnimationFrame(animFrame);
+        animFrame = null;
       }
     }, { threshold: 0 });
+    heroObserver.observe(canvas.parentElement);
 
+    // Mouse interaction
     canvas.parentElement.addEventListener('mousemove', e => {
       const rect = canvas.getBoundingClientRect();
       mouse.x = e.clientX - rect.left;
       mouse.y = e.clientY - rect.top;
     });
-
     canvas.parentElement.addEventListener('mouseleave', () => {
-      mouse.x = -1000;
-      mouse.y = -1000;
+      mouse.x = null;
+      mouse.y = null;
     });
 
-    window.addEventListener('resize', () => { resize(); initParticles(); });
-    resize();
-    initParticles();
-    heroObserver.observe(canvas.parentElement);
+    // Touch interaction
+    canvas.parentElement.addEventListener('touchmove', e => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.touches[0].clientX - rect.left;
+      mouse.y = e.touches[0].clientY - rect.top;
+    }, { passive: true });
+    canvas.parentElement.addEventListener('touchend', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    // Rebuild on resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        cancelAnimationFrame(animFrame);
+        animFrame = null;
+        setupCanvas();
+      }, 200);
+    });
   }
 
   /* ----- Global background particles (#bgCanvas) ----- */
