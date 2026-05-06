@@ -28,7 +28,7 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Spacing */
-  --section-padding: 80px 0;
+  --section-padding: 60px 0;
   --container-width: 1080px;
 
   /* Transitions */
@@ -188,13 +188,13 @@ img { max-width: 100%; display: block; }
    HERO SECTION
    ============================ */
 .hero {
-  min-height: 100vh;
+  min-height: auto;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  padding: 100px 24px 60px;
+  padding: 100px 24px 40px;
 }
 
 .hero-canvas {
@@ -240,7 +240,7 @@ img { max-width: 100%; display: block; }
 
 .terminal {
   color: var(--green);
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   font-family: var(--font-mono);
   font-size: 0.95rem;
   letter-spacing: 1px;
@@ -256,7 +256,7 @@ img { max-width: 100%; display: block; }
   font-size: clamp(2.8rem, 7vw, 4.2rem);
   font-weight: 800;
   line-height: 1.08;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   letter-spacing: -1.5px;
   animation: heroFadeUp 0.7s var(--ease) 0.85s both;
 }
@@ -270,7 +270,7 @@ img { max-width: 100%; display: block; }
   font-size: clamp(1.05rem, 2.5vw, 1.4rem);
   font-weight: 500;
   color: var(--text-secondary);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   letter-spacing: 0.5px;
   animation: heroFadeUp 0.7s var(--ease) 1.05s both;
 }
@@ -279,7 +279,7 @@ img { max-width: 100%; display: block; }
   font-size: 0.95rem;
   color: var(--text-muted);
   font-style: italic;
-  margin-bottom: 36px;
+  margin-bottom: 24px;
   animation: heroFadeUp 0.7s var(--ease) 1.2s both;
 }
 
@@ -288,7 +288,7 @@ img { max-width: 100%; display: block; }
   gap: 14px;
   justify-content: flex-start;
   flex-wrap: wrap;
-  margin-bottom: 44px;
+  margin-bottom: 32px;
   animation: heroFadeUp 0.7s var(--ease) 1.35s both;
 }
 
@@ -1054,8 +1054,8 @@ img { max-width: 100%; display: block; }
   }
 
   .hero {
-    min-height: 80vh; /* Reduced from 100vh to decrease internal gaps */
-    padding: 90px 20px 20px; /* Reduced bottom padding */
+    min-height: auto;
+    padding: 85px 20px 20px;
   }
 
   .hero-inner {
