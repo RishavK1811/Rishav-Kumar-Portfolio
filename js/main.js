@@ -331,15 +331,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Image sizing: fit height to canvas, position right-side on desktop
       const isMobile  = canvas.width < 768;
-      const imgHeight = isMobile ? canvas.height * 0.65 : canvas.height * 0.92;
-      const imgWidth  = imgHeight * (image.naturalWidth / image.naturalHeight);
+      const aspectRatio = image.naturalWidth / image.naturalHeight;
+      
+      let imgHeight, imgWidth;
 
+      if (isMobile) {
+        // Constrain width so it fits on mobile screen
+        imgWidth = canvas.width * 0.9;
+        imgHeight = imgWidth / aspectRatio;
+        
+        // Also constrain height if the screen is very short
+        if (imgHeight > canvas.height * 0.55) {
+          imgHeight = canvas.height * 0.55;
+          imgWidth = imgHeight * aspectRatio;
+        }
+      } else {
+        imgHeight = canvas.height * 0.92;
+        imgWidth = imgHeight * aspectRatio;
+        
+        // Constrain width on portrait/square desktop screens or tablet
+        if (imgWidth > canvas.width * 0.45) {
+          imgWidth = canvas.width * 0.45;
+          imgHeight = imgWidth / aspectRatio;
+        }
+      }
+
+      // Position on the right side for both
       const posX = isMobile
-        ? (canvas.width  - imgWidth)  / 2
-        : canvas.width  - imgWidth - 20;
+        ? canvas.width - imgWidth // Right aligned on mobile
+        : canvas.width - imgWidth - 40; // Right aligned with padding on desktop
+
       const posY = isMobile
-        ? canvas.height - imgHeight + 20
-        : (canvas.height - imgHeight) / 2;
+        ? canvas.height - imgHeight + 20 // Bottom aligned on mobile
+        : (canvas.height - imgHeight) / 2; // Center aligned vertically on desktop
 
       // Draw image to canvas to sample pixels
       ctx.clearRect(0, 0, canvas.width, canvas.height);
