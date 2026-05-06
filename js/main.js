@@ -336,13 +336,13 @@ document.addEventListener('DOMContentLoaded', () => {
       let imgHeight, imgWidth;
 
       if (isMobile) {
-        // Constrain width so it fits on mobile screen
-        imgWidth = canvas.width * 0.9;
+        // Constrain width so it stays strictly on the right side, just like desktop
+        imgWidth = canvas.width * 0.55;
         imgHeight = imgWidth / aspectRatio;
         
         // Also constrain height if the screen is very short
-        if (imgHeight > canvas.height * 0.55) {
-          imgHeight = canvas.height * 0.55;
+        if (imgHeight > canvas.height * 0.6) {
+          imgHeight = canvas.height * 0.6;
           imgWidth = imgHeight * aspectRatio;
         }
       } else {
