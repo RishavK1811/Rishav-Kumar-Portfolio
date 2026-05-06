@@ -443,6 +443,10 @@ img { max-width: 100%; display: block; }
    ============================ */
 .section {
   padding: var(--section-padding);
+  min-height: clamp(500px, 80vh, 800px); /* Responsive min-height that adapts but stays bounded */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .section-title {
@@ -1013,6 +1017,22 @@ img { max-width: 100%; display: block; }
 
   .carousel-scene {
     height: 500px;
+  }
+}
+
+/* ============================
+   MOBILE 'DESKTOP MODE' & TALL SCREENS
+   Optimizes layout for portrait screens that are wide (Desktop Mode on phones)
+   ============================ */
+@media (max-aspect-ratio: 1.4/1) {
+  .hero {
+    min-height: 80vh; /* Reduced height for tall screens to avoid massive gaps */
+    padding-top: 120px;
+    padding-bottom: 60px;
+  }
+
+  :root {
+    --section-padding: 60px 0;
   }
 }
 
