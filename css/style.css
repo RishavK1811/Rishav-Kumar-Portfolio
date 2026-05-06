@@ -62,6 +62,9 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -69,6 +72,8 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.7;
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
