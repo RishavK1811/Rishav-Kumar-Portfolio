@@ -28,7 +28,7 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Spacing */
-  --section-padding: 60px 0;
+  --section-padding: 80px 0;
   --container-width: 1080px;
 
   /* Transitions */
@@ -188,13 +188,13 @@ img { max-width: 100%; display: block; }
    HERO SECTION
    ============================ */
 .hero {
-  min-height: auto;
+  min-height: 100vh;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  padding: 100px 24px 40px;
+  padding: 100px 24px 60px;
 }
 
 .hero-canvas {
@@ -240,7 +240,7 @@ img { max-width: 100%; display: block; }
 
 .terminal {
   color: var(--green);
-  margin-bottom: 12px;
+  margin-bottom: 20px;
   font-family: var(--font-mono);
   font-size: 0.95rem;
   letter-spacing: 1px;
@@ -256,7 +256,7 @@ img { max-width: 100%; display: block; }
   font-size: clamp(2.8rem, 7vw, 4.2rem);
   font-weight: 800;
   line-height: 1.08;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
   letter-spacing: -1.5px;
   animation: heroFadeUp 0.7s var(--ease) 0.85s both;
 }
@@ -270,7 +270,7 @@ img { max-width: 100%; display: block; }
   font-size: clamp(1.05rem, 2.5vw, 1.4rem);
   font-weight: 500;
   color: var(--text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   letter-spacing: 0.5px;
   animation: heroFadeUp 0.7s var(--ease) 1.05s both;
 }
@@ -279,7 +279,7 @@ img { max-width: 100%; display: block; }
   font-size: 0.95rem;
   color: var(--text-muted);
   font-style: italic;
-  margin-bottom: 24px;
+  margin-bottom: 36px;
   animation: heroFadeUp 0.7s var(--ease) 1.2s both;
 }
 
@@ -288,7 +288,7 @@ img { max-width: 100%; display: block; }
   gap: 14px;
   justify-content: flex-start;
   flex-wrap: wrap;
-  margin-bottom: 32px;
+  margin-bottom: 44px;
   animation: heroFadeUp 0.7s var(--ease) 1.35s both;
 }
 
@@ -1014,7 +1014,7 @@ img { max-width: 100%; display: block; }
 /* Mobile */
 @media (max-width: 640px) {
   :root {
-    --section-padding: 40px 0; /* Reduced from 56px to decrease gaps between sections */
+    --section-padding: 56px 0;
   }
 
   .nav-container {
@@ -1054,8 +1054,7 @@ img { max-width: 100%; display: block; }
   }
 
   .hero {
-    min-height: auto;
-    padding: 85px 20px 20px;
+    padding: 90px 20px 50px;
   }
 
   .hero-inner {
@@ -1070,16 +1069,10 @@ img { max-width: 100%; display: block; }
 
   .hero-content h1 {
     font-size: 2.4rem;
-    margin-bottom: 8px;
-  }
-
-  .subtitle {
-    margin-bottom: 24px;
   }
 
   .buttons {
     justify-content: center;
-    margin-bottom: 32px;
   }
 
   .stats {
