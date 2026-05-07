@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0f">
   <title>Rishav Kumar | Cybersecurity Portfolio</title>
   <meta name="description" content="Rishav Kumar — Aspiring Cybersecurity Analyst specializing in network security, ethical hacking, and vulnerability assessment.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,32 +43,79 @@
   <!-- ===== HERO ===== -->
   <section class="hero" id="hero">
     <canvas class="hero-canvas" id="heroCanvas"></canvas>
+
+    <!-- HUD Top-Left Corner Brackets (decorative) -->
+    <div class="hero-hud" aria-hidden="true">
+      <span class="hud-corner tl"></span>
+      <span class="hud-corner tr"></span>
+      <span class="hud-corner bl"></span>
+      <span class="hud-corner br"></span>
+    </div>
+
+    <!-- HUD System Info (top-right floating chip) -->
+    <div class="hero-sysinfo" aria-hidden="true">
+      <span class="sys-dot"></span>
+      <span class="sys-label">SYS</span>
+      <span class="sys-value" id="sysClock">--:--:--</span>
+      <span class="sys-sep">|</span>
+      <span class="sys-label">UPTIME</span>
+      <span class="sys-value" id="sysUptime">00:00</span>
+    </div>
+
     <div class="hero-inner">
       <div class="hero-content">
+
+        <!-- Status Chips Row -->
+        <div class="status-chips" data-anim="hero-fade">
+          <span class="chip chip-live">
+            <span class="chip-dot"></span> ONLINE
+          </span>
+          <span class="chip">
+            <span class="chip-icon">⟦</span> ENCRYPTED
+          </span>
+          <span class="chip">
+            <span class="chip-icon">◇</span> TOR ROUTED
+          </span>
+        </div>
+
         <p class="terminal">$ whoami</p>
-        
-        <h1>
+
+        <!-- Glitch H1 -->
+        <h1 class="glitch" data-text="Rishav Kumar">
           Rishav <span>Kumar</span>
         </h1>
-        
-        <h2>Aspiring Cybersecurity Analyst</h2>
-        
+
+        <!-- Typed Role Rotator -->
+        <h2>
+          <span class="role-prefix">&gt;</span>
+          <span id="roleText" class="role-text">Aspiring Cybersecurity Analyst</span><span class="role-cursor">|</span>
+        </h2>
+
         <p class="subtitle">
+          <span class="sub-bracket">[</span>
           I identify vulnerabilities before attackers do.
+          <span class="sub-bracket">]</span>
         </p>
-    
+
         <div class="buttons">
-          <a href="#projects" class="btn primary">View Projects</a>
-          <a href="#" class="btn secondary">Download Resume</a>
+          <a href="#projects" class="btn primary">
+            <span class="btn-text">View Projects</span>
+            <span class="btn-arrow">→</span>
+          </a>
+          <a href="#" class="btn secondary">
+            <span class="btn-text">Download Resume</span>
+            <span class="btn-icon">↓</span>
+          </a>
         </div>
-    
+
         <div class="stats">
-          <div><h3>10+</h3><p>CTFs Played</p></div>
-          <div><h3>5+</h3><p>Projects</p></div>
-          <div><h3>3+</h3><p>Certifications</p></div>
+          <div><h3 data-count="10">10+</h3><p>CTFs Played</p></div>
+          <div><h3 data-count="5">5+</h3><p>Projects</p></div>
+          <div><h3 data-count="3">3+</h3><p>Certifications</p></div>
         </div>
       </div>
     </div>
+
     <div class="scroll-indicator">
       <div class="scroll-line"></div>
       <span>Scroll</span>
@@ -193,90 +241,38 @@
   </section>
 
   <!-- ===== PROJECTS ===== -->
-  <section class="section projects" id="projects">
-    <div class="container">
-      <h2 class="section-title"><span class="title-hash">#</span> Featured Projects</h2>
-      <div class="carousel-wrapper">
-        <div class="carousel-scene">
-          <div class="carousel-ring" id="carouselRing">
-            <!-- Project 1 -->
-            <article class="project-card">
-              <div class="project-image">
-                <img src="assets/proj_vuln_scanner.png" alt="Vulnerability Scanner">
-              </div>
-              <div class="project-body">
-                <div class="project-number">01</div>
-                <h3 class="project-name">Network Vulnerability Scanner</h3>
-                <p class="project-desc">Built a Python-based scanner that automates Nmap scans, detects open ports, identifies running services, and generates structured vulnerability reports.</p>
-                <div class="project-tools">
-                  <span>Python</span><span>Nmap</span><span>Scapy</span><span>Linux</span>
-                </div>
-                <div class="project-links">
-                  <a href="#" class="project-link">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                    Source Code
-                  </a>
-                  <a href="#" class="project-link">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                    Live Demo
-                  </a>
-                </div>
-              </div>
-            </article>
-            <!-- Project 2 -->
-            <article class="project-card">
-              <div class="project-image">
-                <img src="assets/proj_soc_dashboard.png" alt="Packet Sniffer & Analyzer">
-              </div>
-              <div class="project-body">
-                <div class="project-number">02</div>
-                <h3 class="project-name">Packet Sniffer & Analyzer</h3>
-                <p class="project-desc">Developed a real-time packet capture tool using Scapy that monitors network traffic, filters by protocol, and flags suspicious patterns for analysis.</p>
-                <div class="project-tools">
-                  <span>Python</span><span>Scapy</span><span>Wireshark</span><span>TCP/IP</span>
-                </div>
-                <div class="project-links">
-                  <a href="#" class="project-link">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                    Source Code
-                  </a>
-                  <a href="#" class="project-link">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                    Live Demo
-                  </a>
-                </div>
-              </div>
-            </article>
-            <!-- Project 3 -->
-            <article class="project-card">
-              <div class="project-image">
-                <img src="assets/proj_phishing.png" alt="Web App Pentesting Lab">
-              </div>
-              <div class="project-body">
-                <div class="project-number">03</div>
-                <h3 class="project-name">Web App Pentesting Lab</h3>
-                <p class="project-desc">Set up a local pentesting environment with intentionally vulnerable apps (DVWA, Juice Shop) and documented exploits for OWASP Top 10 vulnerabilities.</p>
-                <div class="project-tools">
-                  <span>Burp Suite</span><span>DVWA</span><span>SQLi</span><span>XSS</span>
-                </div>
-                <div class="project-links">
-                  <a href="#" class="project-link">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                    Source Code
-                  </a>
-                  <a href="#" class="project-link">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                    Write-up
-                  </a>
-                </div>
-              </div>
-            </article>
-          </div>
+ <section class="section projects-cyber" id="projects">
+    <div class="cyber-container">
+      
+      <div class="cyber-menu">
+        <h2 class="cyber-title">PROJECTS_</h2>
+        <div class="cyber-subtitle">&gt;&gt;&gt; SELECT CATEGORY</div>
+        
+        <ul class="cyber-list">
+          <li><a href="#" class="cyber-link"><span class="bracket">[01]</span> WEB APPLICATIONS</a></li>
+          <li><a href="#" class="cyber-link"><span class="bracket">[02]</span> MOBILE APPS</a></li>
+          <li><a href="#" class="cyber-link"><span class="bracket">[03]</span> CYBERSECURITY TOOLS</a></li>
+          <li><a href="#" class="cyber-link"><span class="bracket">[04]</span> UI/UX DESIGNS</a></li>
+          <li><a href="#" class="cyber-link"><span class="bracket">[05]</span> SYSTEM AUTOMATION</a></li>
+        </ul>
+
+        <div class="cyber-status">
+          <div class="status-line">STATUS: <span class="status-live">NETWORK SCANNED</span></div>
+          <div class="status-line">NODES ACTIVE: <span id="nodeCount">0</span></div>
+          <div class="status-loader"></div>
         </div>
       </div>
+
+      <div class="cyber-visual-wrapper">
+        <div class="visual-hud-top">TARGET TOPOLOGY // RECONNAISSANCE</div>
+        <canvas id="networkCanvas"></canvas>
+        <div class="visual-hud-bottom">SCANNING...</div>
+        <div class="visual-vignette"></div>
+      </div>
+
     </div>
   </section>
-
+  
   <!-- ===== CERTIFICATIONS ===== -->
   <section class="section certifications" id="certifications">
     <div class="container">
@@ -316,10 +312,10 @@
       <h2 class="section-title"><span class="title-hash">#</span> Get In Touch</h2>
       <p class="contact-subtitle">Interested in working together or have a question? Let's connect.</p>
       <div class="contact-grid">
-        <a href="mailto:rishav@example.com" class="contact-card" data-reveal>
+        <a href="/cdn-cgi/l/email-protection#ddafb4aeb5bcab9db8a5bcb0adb1b8f3beb2b0" class="contact-card" data-reveal>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           <span>Email</span>
-          <p>rishav@example.com</p>
+          <p><span class="__cf_email__" data-cfemail="04766d776c657244617c65697468612a676b69">[email&#160;protected]</span></p>
         </a>
         <a href="https://www.linkedin.com/in/rishav-kumar-317134368" target="_blank" class="contact-card" data-reveal>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
@@ -348,6 +344,6 @@
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/main.js"></script>
 </body>
 </html>
