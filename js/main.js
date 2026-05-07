@@ -1,31 +1,148 @@
 /* ============================
-   MAIN.JS — Portfolio Interactions
+   MAIN.JS — Portfolio Interactions (Optimized)
    ============================ */
 
 document.addEventListener('DOMContentLoaded', () => {
+
+  /* ---- Global perf helpers ---- */
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobileViewport = () => window.innerWidth < 768;
+
+  // Throttle helper using rAF (smoother than setTimeout)
+  const rafThrottle = (fn) => {
+    let ticking = false;
+    return (...args) => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          fn(...args);
+          ticking = false;
+        });
+      }
+    };
+  };
 
   /* ----- Mobile Nav Toggle ----- */
   const navToggle = document.getElementById('navToggle');
   const navMenu = document.getElementById('navMenu');
 
-  navToggle.addEventListener('click', () => {
-    navToggle.classList.toggle('active');
-    navMenu.classList.toggle('open');
-  });
-
-  // Close menu on link click
-  document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-      navToggle.classList.remove('active');
-      navMenu.classList.remove('open');
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('active');
+      navMenu.classList.toggle('open');
     });
-  });
 
-  /* ----- Dynamic Terminal Typing Effect ----- */
+    // Close menu on link click
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('active');
+        navMenu.classList.remove('open');
+      });
+    });
+  }
+
+  /* ============================
+     HERO HUD: System clock + uptime
+     ============================ */
+  const sysClock  = document.getElementById('sysClock');
+  const sysUptime = document.getElementById('sysUptime');
+  const heroSectionEl = document.getElementById('hero');
+  if (sysClock || sysUptime) {
+    const startTs = Date.now();
+    const pad = n => String(n).padStart(2, '0');
+    const tick = () => {
+      const d = new Date();
+      if (sysClock) sysClock.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      if (sysUptime) {
+        const sec = Math.floor((Date.now() - startTs) / 1000);
+        sysUptime.textContent = `${pad(Math.floor(sec/60))}:${pad(sec%60)}`;
+      }
+    };
+    tick();
+    // Run only when hero is visible — saves CPU
+    let clockInterval = setInterval(tick, 1000);
+    if ('IntersectionObserver' in window && heroSectionEl) {
+      const heroVisObs = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          if (!clockInterval) clockInterval = setInterval(tick, 1000);
+        } else {
+          clearInterval(clockInterval);
+          clockInterval = null;
+        }
+      }, { threshold: 0.05 });
+      heroVisObs.observe(heroSectionEl);
+    }
+  }
+
+  /* ============================
+     HERO: Multi-Role Typewriter
+     ============================ */
+  const roleEl = document.getElementById('roleText');
+  if (roleEl && !prefersReducedMotion) {
+    const roles = [
+      'Aspiring Cybersecurity Analyst',
+      'Ethical Hacker in Training',
+      'Network Security Enthusiast',
+      'CTF Player & Bug Hunter',
+      'SOC Analyst Aspirant'
+    ];
+    let rIdx = 0, cIdx = 0, deleting = false;
+    const TYPE_SPEED = 70, DEL_SPEED = 35, HOLD = 1700;
+
+    const typeRole = () => {
+      const txt = roles[rIdx];
+      if (!deleting) {
+        roleEl.textContent = txt.slice(0, ++cIdx);
+        if (cIdx === txt.length) {
+          deleting = true;
+          setTimeout(typeRole, HOLD);
+          return;
+        }
+        setTimeout(typeRole, TYPE_SPEED);
+      } else {
+        roleEl.textContent = txt.slice(0, --cIdx);
+        if (cIdx === 0) {
+          deleting = false;
+          rIdx = (rIdx + 1) % roles.length;
+        }
+        setTimeout(typeRole, DEL_SPEED);
+      }
+    };
+    // Start after hero entrance animation finishes (~1.4s)
+    setTimeout(typeRole, 1500);
+  }
+
+  /* ============================
+     HERO: Random Glitch Flicker on H1 (subtle)
+     ============================ */
+  const glitchH1 = document.querySelector('.hero-content h1.glitch');
+  if (glitchH1 && !prefersReducedMotion) {
+    let glitchTimer;
+    const scheduleGlitch = () => {
+      const wait = 4000 + Math.random() * 6000; // 4–10s random
+      glitchTimer = setTimeout(() => {
+        glitchH1.classList.add('auto-flicker');
+        setTimeout(() => glitchH1.classList.remove('auto-flicker'), 220);
+        scheduleGlitch();
+      }, wait);
+    };
+    // Pause flicker if hero out of view
+    if ('IntersectionObserver' in window && heroSectionEl) {
+      const obs = new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) scheduleGlitch();
+        else clearTimeout(glitchTimer);
+      }, { threshold: 0.1 });
+      obs.observe(heroSectionEl);
+    } else {
+      scheduleGlitch();
+    }
+  }
+
+  /* ----- Dynamic Terminal Typing Effect (about section) ----- */
   const termCommand = document.getElementById('termCommand');
   const termOutput = document.getElementById('termOutput');
   const aboutTerminal = document.getElementById('aboutTerminal');
-  
+
   if (termCommand && termOutput && aboutTerminal) {
     const commands = [
       { cmd: 'whoami', out: 'Rishav - Cybersecurity Student' },
@@ -35,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
       { cmd: 'uname -a', out: 'Aspiring SOC Analyst | Ethical Hacking Enthusiast' }
     ];
 
-    // Shuffle once on load
     commands.sort(() => Math.random() - 0.5);
 
     let currentCmdIndex = 0;
@@ -45,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let resumeAutoTimeout;
     let isWaitingForNewCommand = false;
 
-    // Create a hidden input to capture keystrokes
     const hiddenInput = document.createElement('input');
     hiddenInput.type = 'text';
     hiddenInput.style.position = 'absolute';
@@ -93,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hiddenInput.value = '';
       }
       resetUserIdle();
-      
+
       if (isWaitingForNewCommand && e.key !== 'Enter') {
         termCommand.textContent = '';
         termOutput.textContent = '';
@@ -118,25 +233,25 @@ document.addEventListener('DOMContentLoaded', () => {
           termCommand.textContent = '';
           termOutput.textContent = '';
         }
-        
+
         hiddenInput.value = '';
         isWaitingForNewCommand = true;
       }
     });
 
-    hiddenInput.addEventListener('input', (e) => {
+    hiddenInput.addEventListener('input', () => {
       if (autoTypingActive) {
         clearAutoTyping();
         termCommand.textContent = '';
         termOutput.textContent = '';
       }
       resetUserIdle();
-      
+
       if (isWaitingForNewCommand) {
         termOutput.textContent = '';
         isWaitingForNewCommand = false;
       }
-      
+
       termCommand.textContent = hiddenInput.value;
     });
 
@@ -146,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
       termCommand.textContent = '';
       termOutput.textContent = '';
       isWaitingForNewCommand = false;
-      
+
       typeInterval = setInterval(() => {
         if (!autoTypingActive) {
           clearInterval(typeInterval);
@@ -180,102 +295,110 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     };
 
-    // Start slightly after page load
     setTimeout(runTerminal, 1000);
   }
 
-  /* ----- Navbar scroll effect ----- */
+  /* ----- Navbar scroll effect (rAF throttled) ----- */
   const navbar = document.getElementById('navbar');
-  const onScroll = () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 40);
-  };
+  const onScroll = rafThrottle(() => {
+    if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 40);
+  });
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  /* ----- Active nav link on scroll ----- */
+  /* ----- Active nav link on scroll (rAF throttled + cached offsets) ----- */
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.nav-link');
 
-  const updateActiveLink = () => {
-    const scrollY = window.scrollY + 120;
-    sections.forEach(section => {
-      const top = section.offsetTop;
-      const height = section.offsetHeight;
-      const id = section.getAttribute('id');
-      if (scrollY >= top && scrollY < top + height) {
-        navLinks.forEach(link => {
-          link.classList.remove('active');
-          if (link.getAttribute('href') === '#' + id) {
-            link.classList.add('active');
-          }
-        });
-      }
-    });
+  // Cache offsets and re-cache on resize for perf
+  let sectionCache = [];
+  const cacheSections = () => {
+    sectionCache = Array.from(sections).map(s => ({
+      id: s.id,
+      top: s.offsetTop,
+      height: s.offsetHeight
+    }));
   };
+  cacheSections();
+  window.addEventListener('resize', rafThrottle(cacheSections), { passive: true });
+  // Recache after fonts/images load
+  window.addEventListener('load', cacheSections);
+
+  const updateActiveLink = rafThrottle(() => {
+    const scrollY = window.scrollY + 120;
+    for (const sec of sectionCache) {
+      if (scrollY >= sec.top && scrollY < sec.top + sec.height) {
+        navLinks.forEach(link => {
+          const isActive = link.getAttribute('href') === '#' + sec.id;
+          link.classList.toggle('active', isActive);
+        });
+        break;
+      }
+    }
+  });
   window.addEventListener('scroll', updateActiveLink, { passive: true });
 
   /* ----- Scroll reveal ----- */
   const revealElements = document.querySelectorAll('[data-reveal]');
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        // Stagger the reveal slightly for cards in grids
-        const delay = entry.target.dataset.revealDelay || 0;
-        setTimeout(() => {
-          entry.target.classList.add('revealed');
-        }, delay);
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  if ('IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.dataset.revealDelay || 0;
+          setTimeout(() => {
+            entry.target.classList.add('revealed');
+          }, delay);
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-  // Add staggered delays to grid children
-  document.querySelectorAll('.skills-grid, .projects-grid, .certs-grid, .contact-grid').forEach(grid => {
-    grid.querySelectorAll('[data-reveal]').forEach((el, i) => {
-      el.dataset.revealDelay = i * 80;
+    document.querySelectorAll('.skills-grid, .projects-grid, .certs-grid, .contact-grid').forEach(grid => {
+      grid.querySelectorAll('[data-reveal]').forEach((el, i) => {
+        el.dataset.revealDelay = i * 80;
+      });
     });
-  });
 
-  revealElements.forEach(el => revealObserver.observe(el));
+    revealElements.forEach(el => revealObserver.observe(el));
+  } else {
+    revealElements.forEach(el => el.classList.add('revealed'));
+  }
 
   /* ----- Stat counter animation ----- */
   const statNumbers = document.querySelectorAll('.stat-number');
-  const statObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const el = entry.target;
-        const target = parseInt(el.dataset.count);
-        let current = 0;
-        const step = Math.max(1, Math.floor(target / 30));
-        const interval = setInterval(() => {
-          current += step;
-          if (current >= target) {
-            current = target;
-            clearInterval(interval);
-          }
-          el.textContent = current;
-        }, 40);
-        statObserver.unobserve(el);
-      }
-    });
-  }, { threshold: 0.5 });
+  if ('IntersectionObserver' in window && statNumbers.length) {
+    const statObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.dataset.count);
+          let current = 0;
+          const step = Math.max(1, Math.floor(target / 30));
+          const interval = setInterval(() => {
+            current += step;
+            if (current >= target) {
+              current = target;
+              clearInterval(interval);
+            }
+            el.textContent = current;
+          }, 40);
+          statObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
 
-  statNumbers.forEach(el => statObserver.observe(el));
+    statNumbers.forEach(el => statObserver.observe(el));
+  }
 
   /* ============================================================
      Hero Canvas — DUAL HACKER PARTICLE EFFECT + PC HACK CINEMATIC
-     - 2 images: hacker.png (standing) + hack.png (with laptop)
-     - Auto-switches every 10 sec with FULL HACK ANIMATION
-     - Click also triggers switch
-     - Section-locked: hack overlay ONLY visible inside hero
-     - Mouse repulsion stays PURE GREEN
-     - Matrix rain in background
+     (Optimized: capped DPR, mobile-aware density, paused offscreen)
      ============================================================ */
   const canvas = document.getElementById('heroCanvas');
-  const image  = document.getElementById('hackerImage'); // hacker.png (already in HTML)
+  const image  = document.getElementById('hackerImage');
   const heroSection = document.getElementById('hero');
 
-  /* ===== Build Hack Cinematic Overlay (lives INSIDE .hero only) ===== */
+  /* ===== Build Hack Cinematic Overlay ===== */
   let hackOverlay = null;
   if (heroSection) {
     hackOverlay = document.createElement('div');
@@ -371,44 +494,51 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (canvas && image) {
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const ctx = canvas.getContext('2d', { willReadFrequently: true, alpha: true });
+
+    // Cap DPR to 2 for perf — retina screens don't need 3x for particle blobs
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
 
     // --- Load second image (hack.png) ---
     const image2 = new Image();
     image2.src = 'assets/hack.png';
 
     const images       = [image, image2];
-    let   currentImgIdx = 0;        // which image is showing
+    let   currentImgIdx = 0;
     let   particlesArray = [];
     let   animFrame;
     let   frameCount   = 0;
 
-    // --- State ---
     const mouse        = { x: null, y: null, radius: 110 };
 
-    // Glitch transition state
     let isGlitching    = false;
     let glitchFrames   = 0;
-    let switchPending  = false;     // after glitch ends → switch image
-    let isHeroVisible  = true;      // section-bound flag
+    let switchPending  = false;
+    let isHeroVisible  = true;
 
-    // Periodic auto-glitch (random, not tied to switch)
     let autoGlitchTimer   = 0;
-    let nextAutoGlitch    = 300;    // ~5s at 60fps
+    let nextAutoGlitch    = 300;
 
-    // Auto-switch every 10 seconds
     let autoSwitchTimer   = 0;
-    const AUTO_SWITCH_INTERVAL = 900; // 15s @ 60fps
+    const AUTO_SWITCH_INTERVAL = 900;
 
-    // --- Matrix rain ---
     const matrixChars = '01アイウエオカキクケコ><{}[]#$%&';
     let   rainDrops   = [];
 
-    /* ---- resize ---- */
+    /* ---- resize (with DPR cap) ---- */
     const resize = () => {
-      canvas.width  = canvas.parentElement.offsetWidth;
-      canvas.height = canvas.parentElement.offsetHeight;
+      const w = canvas.parentElement.offsetWidth;
+      const h = canvas.parentElement.offsetHeight;
+      canvas.width  = w * DPR;
+      canvas.height = h * DPR;
+      canvas.style.width  = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     };
+
+    // CSS pixel sizes for logic (independent of DPR)
+    const cssW = () => canvas.width / DPR;
+    const cssH = () => canvas.height / DPR;
 
     /* ======== PARTICLE CLASS ======== */
     class Particle {
@@ -428,16 +558,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       draw() {
-        // Breathing pulse — gentle sine on opacity
         const breathe = 0.82 + 0.18 * Math.sin(frameCount * 0.022 + this.baseX * 0.014);
         let   alpha   = this.baseAlpha * breathe;
 
-        // During glitch: random particles flash brighter
         if (isGlitching && Math.random() < 0.12) {
           alpha = Math.min(1, alpha * 1.8);
         }
 
-        // ALWAYS pure green — no blue, no cyan
         ctx.shadowColor = 'rgba(0, 255, 80, 0.6)';
         ctx.shadowBlur  = this.glowSize * (isGlitching ? 2.5 : 1);
         ctx.fillStyle   = `rgba(0, 255, 80, ${alpha.toFixed(2)})`;
@@ -462,13 +589,11 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        // Glitch jitter — particles shake during glitch
         if (isGlitching && Math.random() < 0.1) {
           this.x += (Math.random() - 0.5) * 10;
           this.y += (Math.random() - 0.5) * 5;
         }
 
-        // Mouse repulsion — PURE GREEN, no color change
         if (mouse.x !== null) {
           const dx   = mouse.x - this.x;
           const dy   = mouse.y - this.y;
@@ -480,7 +605,6 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
 
-        // Ease back to base
         this.x += (this.baseX - this.x) * 0.07;
         this.y += (this.baseY - this.y) * 0.07;
       }
@@ -494,14 +618,15 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    /* ======== MATRIX RAIN ======== */
+    /* ======== MATRIX RAIN (mobile-aware density) ======== */
     const initRain = () => {
       rainDrops = [];
-      const cols = Math.floor(canvas.width / 14);
+      const colWidth = isMobileViewport() ? 18 : 14;
+      const cols = Math.floor(cssW() / colWidth);
       for (let i = 0; i < cols; i++) {
         rainDrops.push({
-          x: i * 14,
-          y: Math.random() * -canvas.height,
+          x: i * colWidth,
+          y: Math.random() * -cssH(),
           speed: Math.random() * 1.1 + 0.3,
           char: matrixChars[Math.floor(Math.random() * matrixChars.length)],
           alpha: Math.random() * 0.10 + 0.02,
@@ -519,14 +644,12 @@ document.addEventListener('DOMContentLoaded', () => {
           d.char  = matrixChars[Math.floor(Math.random() * matrixChars.length)];
           d.timer = 0;
         }
-        // Rain gets brighter during glitch
         const a = isGlitching ? Math.min(0.35, d.alpha * 4) : d.alpha;
         ctx.fillStyle = `rgba(0, 255, 80, ${a})`;
         ctx.fillText(d.char, d.x, d.y);
         d.y += d.speed * (isGlitching ? 3 : 1);
-        if (d.y > canvas.height) {
+        if (d.y > cssH()) {
           d.y = Math.random() * -60;
-          d.x = Math.floor(Math.random() * (canvas.width / 14)) * 14;
         }
       }
     };
@@ -535,73 +658,78 @@ document.addEventListener('DOMContentLoaded', () => {
     const drawGlitchOverlay = () => {
       if (!isGlitching) return;
 
-      // Horizontal scanlines flash
       ctx.fillStyle = 'rgba(0, 255, 80, 0.04)';
-      for (let y = 0; y < canvas.height; y += 3) {
-        ctx.fillRect(0, y, canvas.width, 1);
+      for (let y = 0; y < cssH(); y += 3) {
+        ctx.fillRect(0, y, cssW(), 1);
       }
 
-      // Random RGB-split bars
-      for (let s = 0; s < 4; s++) {
-        const y  = Math.random() * canvas.height;
+      // Reduce expensive getImageData ops on mobile
+      const splits = isMobileViewport() ? 2 : 4;
+      for (let s = 0; s < splits; s++) {
+        const y  = Math.random() * cssH();
         const h  = Math.random() * 8 + 2;
         const dx = (Math.random() - 0.5) * 40;
         try {
-          const data = ctx.getImageData(0, y, canvas.width, h);
-          ctx.putImageData(data, dx, y);
-        } catch (e) { /* ignore cross-origin */ }
+          const data = ctx.getImageData(0, y * DPR, canvas.width, h * DPR);
+          ctx.putImageData(data, dx * DPR, y * DPR);
+        } catch (e) {}
       }
 
-      // Corner "ACCESS DENIED / BYPASSING..." text flash
       if (Math.random() < 0.3) {
         const msgs = ['> BYPASSING FIREWALL...', '> INJECTING PAYLOAD', '> ROOT ACCESS GRANTED', '> ENCRYPTING TRAFFIC...', '> SCANNING PORTS...'];
         ctx.font      = '12px "JetBrains Mono", monospace';
         ctx.fillStyle = `rgba(0, 255, 80, ${Math.random() * 0.6 + 0.2})`;
         ctx.fillText(msgs[Math.floor(Math.random() * msgs.length)],
-          Math.random() * (canvas.width * 0.4),
-          Math.random() * canvas.height);
+          Math.random() * (cssW() * 0.4),
+          Math.random() * cssH());
       }
     };
 
-    /* ======== INIT PARTICLES from current image ======== */
+    /* ======== INIT PARTICLES ======== */
     const initParticles = (img) => {
       particlesArray = [];
-      const isMobile    = canvas.width < 768;
+      const w = cssW(), h = cssH();
+      const isMobile    = w < 768;
       const aspectRatio = img.naturalWidth / img.naturalHeight;
       let imgWidth, imgHeight;
 
       if (isMobile) {
-        imgWidth  = canvas.width * 0.55;
+        imgWidth  = w * 0.55;
         imgHeight = imgWidth / aspectRatio;
-        if (imgHeight > canvas.height * 0.6) {
-          imgHeight = canvas.height * 0.6;
+        if (imgHeight > h * 0.6) {
+          imgHeight = h * 0.6;
           imgWidth  = imgHeight * aspectRatio;
         }
       } else {
-        imgHeight = canvas.height * 0.92;
+        imgHeight = h * 0.92;
         imgWidth  = imgHeight * aspectRatio;
-        if (imgWidth > canvas.width * 0.45) {
-          imgWidth  = canvas.width * 0.45;
+        if (imgWidth > w * 0.45) {
+          imgWidth  = w * 0.45;
           imgHeight = imgWidth / aspectRatio;
         }
       }
 
-      const posX = isMobile ? canvas.width - imgWidth : canvas.width - imgWidth - 40;
-      const posY = isMobile ? canvas.height - imgHeight + 20 : (canvas.height - imgHeight) / 2;
+      const posX = isMobile ? w - imgWidth : w - imgWidth - 40;
+      const posY = isMobile ? h - imgHeight + 20 : (h - imgHeight) / 2;
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, w, h);
       ctx.drawImage(img, posX, posY, imgWidth, imgHeight);
+      // Read image data in DEVICE pixels
       const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, w, h);
 
-      const gap = isMobile ? 7 : 6;
-      for (let y = 0; y < canvas.height; y += gap) {
-        for (let x = 0; x < canvas.width; x += gap) {
-          const idx        = (y * canvas.width + x) * 4;
-          const r          = pixels.data[idx];
-          const g          = pixels.data[idx + 1];
-          const b          = pixels.data[idx + 2];
-          const alpha      = pixels.data[idx + 3];
+      // Larger gap on mobile for fewer particles → smoother
+      const gap = isMobile ? 8 : 6;
+      const stride = canvas.width;
+      for (let y = 0; y < h; y += gap) {
+        for (let x = 0; x < w; x += gap) {
+          const px = Math.floor(x * DPR);
+          const py = Math.floor(y * DPR);
+          const idx = (py * stride + px) * 4;
+          const r = pixels.data[idx];
+          const g = pixels.data[idx + 1];
+          const b = pixels.data[idx + 2];
+          const alpha = pixels.data[idx + 3];
           const brightness = (r + g + b) / 3;
           if (alpha > 60 && brightness > 50) {
             particlesArray.push(new Particle(x, y, Math.max(g, brightness)));
@@ -610,7 +738,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    /* ======== HACK CINEMATIC SEQUENCE ======== */
+    /* ======== HACK CINEMATIC SEQUENCES ======== */
     const HACK_SEQUENCES = [
       [
         { t: 0,    cmd: '$ nmap -sS -A 192.168.1.1', cls: 'cmd' },
@@ -668,16 +796,13 @@ document.addEventListener('DOMContentLoaded', () => {
       clearHackTimers();
       hackOverlay.classList.add('active');
 
-      // Red breach flash
       const flash = document.getElementById('hackFlash');
       if (flash) {
         flash.classList.remove('fire');
-        // Force reflow to restart animation
         void flash.offsetWidth;
         flash.classList.add('fire');
       }
 
-      // Alert text random
       const alertEl   = document.getElementById('hackAlert');
       const alertT    = document.getElementById('hackAlertTitle');
       const alertS    = document.getElementById('hackAlertSub');
@@ -690,7 +815,6 @@ document.addEventListener('DOMContentLoaded', () => {
         alertEl.classList.add('show');
       }
 
-      // Radar scanner activate
       const radar = document.getElementById('hackRadar');
       if (radar) {
         radar.classList.remove('active');
@@ -698,13 +822,11 @@ document.addEventListener('DOMContentLoaded', () => {
         radar.classList.add('active');
       }
 
-      // Progress bars
       const prog = document.getElementById('hackProgress');
       if (prog) {
         prog.classList.remove('show');
         void prog.offsetWidth;
         prog.classList.add('show');
-        // Animated percentage counters
         const pcts = ['p1-pct', 'p2-pct', 'p3-pct'];
         const finals = [97, 84, 100];
         const delays = [0, 250, 500];
@@ -726,7 +848,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // IP Trace populate with random-ish data
       const iptIp  = document.getElementById('iptIp');
       const iptMac = document.getElementById('iptMac');
       const iptrace = document.getElementById('hackIptrace');
@@ -746,7 +867,6 @@ document.addEventListener('DOMContentLoaded', () => {
         iptrace.classList.add('show');
       }
 
-      // Skull (only on "big" success moments — 50% chance)
       const skull = document.getElementById('hackSkull');
       if (skull && Math.random() < 0.5) {
         skull.classList.remove('show');
@@ -755,11 +875,12 @@ document.addEventListener('DOMContentLoaded', () => {
         hackTimeouts.push(skullId);
       }
 
-      // Binary code burst
       const bin = document.getElementById('hackBinary');
       if (bin) {
         bin.innerHTML = '';
-        const cols = Math.min(28, Math.floor(window.innerWidth / 60));
+        // Reduce columns on mobile for perf
+        const maxCols = isMobileViewport() ? 14 : 28;
+        const cols = Math.min(maxCols, Math.floor(window.innerWidth / 60));
         for (let i = 0; i < cols; i++) {
           const col = document.createElement('span');
           col.className = 'hack-bin-col';
@@ -775,7 +896,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Fast-typing terminal
       const termBody = document.getElementById('hackTermBody');
       const seq = HACK_SEQUENCES[Math.floor(Math.random() * HACK_SEQUENCES.length)];
       if (termBody) {
@@ -786,14 +906,12 @@ document.addEventListener('DOMContentLoaded', () => {
             el.className = 'hack-term-line ' + (line.cls || '');
             el.textContent = line.cmd;
             termBody.appendChild(el);
-            // Auto-scroll
             termBody.scrollTop = termBody.scrollHeight;
           }, line.t);
           hackTimeouts.push(id);
         });
       }
 
-      // Hide overlay after sequence finishes (~2.2s total)
       const hideId = setTimeout(() => {
         if (hackOverlay) hackOverlay.classList.remove('active');
         if (alertEl)     alertEl.classList.remove('show');
@@ -805,47 +923,40 @@ document.addEventListener('DOMContentLoaded', () => {
       hackTimeouts.push(hideId);
     };
 
-    /* ======== TRIGGER GLITCH → THEN SWITCH IMAGE + HACK CINEMATIC ======== */
+    /* ======== TRIGGER GLITCH ======== */
     const triggerSwitch = () => {
-      if (isGlitching) return; // already switching
-      if (!isHeroVisible) return; // SECTION LOCK: only inside home
+      if (isGlitching) return;
+      if (!isHeroVisible) return;
       isGlitching   = true;
       glitchFrames  = 0;
       switchPending = true;
-      autoSwitchTimer = 0; // reset auto-switch timer
-      runHackCinematic(); // 🎬 launch the full hack movie
+      autoSwitchTimer = 0;
+      runHackCinematic();
     };
 
     /* ======== MAIN ANIMATE LOOP ======== */
     const animate = () => {
       frameCount++;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, cssW(), cssH());
 
-      // Matrix rain (behind particles)
       drawRain();
 
-      // Draw particles
       for (let i = 0; i < particlesArray.length; i++) {
         particlesArray[i].draw();
         particlesArray[i].update();
       }
 
-      // Glitch overlay
       drawGlitchOverlay();
 
-      // Manage glitch duration — longer for the hack cinematic (~85 frames ≈ 1.4s)
       if (isGlitching) {
         glitchFrames++;
-        // Mid-glitch: scatter all particles violently for dramatic effect
         if (switchPending && glitchFrames === 20) {
           for (let i = 0; i < particlesArray.length; i++) particlesArray[i].scatter();
         }
-        // Swap the image at frame 50 (mid-cinematic) so re-formation is visible
         if (switchPending && glitchFrames === 50) {
           currentImgIdx  = currentImgIdx === 0 ? 1 : 0;
           initParticles(images[currentImgIdx]);
         }
-        // End glitch
         const glitchLen = switchPending ? 110 : 40;
         if (glitchFrames > glitchLen) {
           isGlitching = false;
@@ -854,18 +965,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Auto-switch every 10 seconds
       autoSwitchTimer++;
       if (autoSwitchTimer >= AUTO_SWITCH_INTERVAL) {
         triggerSwitch();
       }
 
-      // Random ambient glitch (not switching image) every ~8–15s
       autoGlitchTimer++;
       if (!isGlitching && autoGlitchTimer >= nextAutoGlitch) {
         isGlitching     = true;
         glitchFrames    = 0;
-        switchPending   = false; // just visual glitch, no switch
+        switchPending   = false;
         autoGlitchTimer = 0;
         nextAutoGlitch  = Math.floor(Math.random() * 420) + 300;
         setTimeout(() => {
@@ -887,29 +996,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const waitForBothImages = () => {
       let loaded = 0;
       const onLoad = () => { loaded++; if (loaded === 2) setupCanvas(); };
-      if (image.complete  && image.naturalWidth  > 0) onLoad(); else image.addEventListener('load', onLoad);
-      if (image2.complete && image2.naturalWidth > 0) onLoad(); else image2.addEventListener('load', onLoad);
+      const onErr  = () => { loaded++; if (loaded === 2) setupCanvas(); }; // fallback if image missing
+      if (image.complete  && image.naturalWidth  > 0) onLoad();
+      else { image.addEventListener('load', onLoad); image.addEventListener('error', onErr); }
+      if (image2.complete && image2.naturalWidth > 0) onLoad();
+      else { image2.addEventListener('load', onLoad); image2.addEventListener('error', onErr); }
     };
     waitForBothImages();
 
-    // Pause when out of view + SECTION LOCK for hack cinematic
-    const heroObserver = new IntersectionObserver(entries => {
-      const visible = entries[0].isIntersecting;
-      isHeroVisible = visible;
-      if (visible) {
-        if (!animFrame) animate();
-      } else {
+    // Pause when out of view
+    if ('IntersectionObserver' in window) {
+      const heroObserver = new IntersectionObserver(entries => {
+        const visible = entries[0].isIntersecting;
+        isHeroVisible = visible;
+        if (visible) {
+          if (!animFrame) animate();
+        } else {
+          cancelAnimationFrame(animFrame);
+          animFrame = null;
+          if (hackOverlay) hackOverlay.classList.remove('active');
+          clearHackTimers();
+          autoSwitchTimer = 0;
+        }
+      }, { threshold: 0.15 });
+      heroObserver.observe(heroSection || canvas.parentElement);
+    }
+
+    // Pause on tab hidden — saves battery on mobile
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
         cancelAnimationFrame(animFrame);
         animFrame = null;
-        // Force-hide hack overlay if user scrolled away mid-animation
-        if (hackOverlay) hackOverlay.classList.remove('active');
-        clearHackTimers();
-        autoSwitchTimer = 0; // reset so timer doesn't accumulate while away
+      } else if (isHeroVisible && !animFrame) {
+        animate();
       }
-    }, { threshold: 0.15 });
-    heroObserver.observe(heroSection || canvas.parentElement);
+    });
 
-    // Mouse move — pure repulsion, no color change
+    // Mouse / Touch
     canvas.parentElement.addEventListener('mousemove', e => {
       const rect = canvas.getBoundingClientRect();
       mouse.x = e.clientX - rect.left;
@@ -919,12 +1042,10 @@ document.addEventListener('DOMContentLoaded', () => {
       mouse.x = null; mouse.y = null;
     });
 
-    // Click → trigger glitch + switch
     canvas.parentElement.addEventListener('click', () => {
       triggerSwitch();
     });
 
-    // Touch
     canvas.parentElement.addEventListener('touchmove', e => {
       const rect = canvas.getBoundingClientRect();
       mouse.x = e.touches[0].clientX - rect.left;
@@ -934,7 +1055,7 @@ document.addEventListener('DOMContentLoaded', () => {
       mouse.x = null; mouse.y = null;
     });
 
-    // Rebuild on resize
+    // Rebuild on resize (debounced)
     let resizeTimeout;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
@@ -942,14 +1063,14 @@ document.addEventListener('DOMContentLoaded', () => {
         cancelAnimationFrame(animFrame);
         animFrame = null;
         setupCanvas();
-      }, 200);
+      }, 220);
     });
   }
 
-  /* ----- Global background particles (#bgCanvas) ----- */
+  /* ----- Global background particles (#bgCanvas) — optimized ----- */
   const bgCanvas = document.getElementById('bgCanvas');
   if (bgCanvas) {
-    const bgCtx = bgCanvas.getContext('2d');
+    const bgCtx = bgCanvas.getContext('2d', { alpha: true });
     let bgParticles = [];
     let bgFrame;
 
@@ -963,15 +1084,14 @@ document.addEventListener('DOMContentLoaded', () => {
       init() {
         this.x  = Math.random() * bgCanvas.width;
         this.y  = Math.random() * bgCanvas.height;
-        this.r  = Math.random() * 1.2 + 0.4;          // 0.4–1.6px
-        this.vx = (Math.random() - 0.5) * 0.18;       // very slow
+        this.r  = Math.random() * 1.2 + 0.4;
+        this.vx = (Math.random() - 0.5) * 0.18;
         this.vy = (Math.random() - 0.5) * 0.18;
-        this.a  = Math.random() * 0.07 + 0.03;        // 0.03–0.10 opacity
+        this.a  = Math.random() * 0.07 + 0.03;
       }
       update() {
         this.x += this.vx;
         this.y += this.vy;
-        // Wrap around edges
         if (this.x < -2) this.x = bgCanvas.width  + 2;
         if (this.x > bgCanvas.width  + 2) this.x = -2;
         if (this.y < -2) this.y = bgCanvas.height + 2;
@@ -986,115 +1106,262 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const bgInit = () => {
-      // ~1 particle per 20k px² — capped at 60
-      const count = Math.min(60, Math.floor((bgCanvas.width * bgCanvas.height) / 20000));
+      // Mobile: fewer particles for perf | Desktop: capped at 60
+      const maxCap = isMobileViewport() ? 25 : 60;
+      const count = Math.min(maxCap, Math.floor((bgCanvas.width * bgCanvas.height) / 22000));
       bgParticles = Array.from({ length: count }, () => new BgParticle());
     };
 
     const bgAnimate = () => {
       bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-      bgParticles.forEach(p => { p.update(); p.draw(); });
+      for (let i = 0; i < bgParticles.length; i++) {
+        bgParticles[i].update();
+        bgParticles[i].draw();
+      }
       bgFrame = requestAnimationFrame(bgAnimate);
     };
 
-    window.addEventListener('resize', () => { bgResize(); bgInit(); }, { passive: true });
+    let bgResizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(bgResizeTimer);
+      bgResizeTimer = setTimeout(() => { bgResize(); bgInit(); }, 200);
+    }, { passive: true });
+
     bgResize();
     bgInit();
-    bgAnimate();
+    if (!prefersReducedMotion) bgAnimate();
 
-    // Pause when tab is hidden (battery / CPU saving)
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) cancelAnimationFrame(bgFrame);
-      else bgAnimate();
+      if (document.hidden) {
+        cancelAnimationFrame(bgFrame);
+        bgFrame = null;
+      } else if (!bgFrame && !prefersReducedMotion) {
+        bgAnimate();
+      }
     });
   }
 
-  /* ----- 3D Project Orbit (solar system) ----- */
-  const ring = document.getElementById('carouselRing');
-  if (ring) {
-    const cards = ring.querySelectorAll('.project-card');
-    const n = cards.length;
-    const angleStep = 360 / n;
+  /* ============================================================
+     PROJECTS SECTION — NETWORK TOPOLOGY SCANNER
+     ============================================================ */
+  const netCanvas = document.getElementById('networkCanvas');
+  const projSection = document.getElementById('projects');
 
-    // Radius = distance from center; bigger = more spread
-    const cardW = cards[0] ? cards[0].offsetWidth : 280;
-    const radius = Math.round(cardW * 1.05);
+  if (netCanvas && projSection) {
+    const ctx = netCanvas.getContext('2d', { alpha: true });
+    
+    let nodes = [];
+    let packets = [];
+    let scanLineY = 0;
+    let netFrame;
+    let isNetVisible = false;
 
-    // Position each card around the ring
-    cards.forEach((card, i) => {
-      const angle = i * angleStep;
-      card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
-    });
-
-    const wrapper = ring.closest('.carousel-wrapper');
-    let currentAngle = 0;
-    let targetAngle = 0;
-    let autoRotateSpeed = 0.2;
-    let isDragging = false;
-    let startX = 0;
-    let lastX = 0;
-    let isHovered = false;
-
-    // Hover state
-    wrapper.addEventListener('mouseenter', () => isHovered = true);
-    wrapper.addEventListener('mouseleave', () => {
-      isHovered = false;
-      isDragging = false;
-    });
-
-    // Mouse Drag
-    wrapper.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX;
-      lastX = e.clientX;
-      wrapper.style.cursor = 'grabbing';
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const deltaX = e.clientX - lastX;
-      targetAngle += deltaX * 0.5;
-      lastX = e.clientX;
-    });
-
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
-      wrapper.style.cursor = 'grab';
-    });
-
-    // Touch Swipe
-    wrapper.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      startX = e.touches[0].clientX;
-      lastX = e.touches[0].clientX;
-    }, { passive: true });
-
-    window.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const deltaX = e.touches[0].clientX - lastX;
-      targetAngle += deltaX * 0.5;
-      lastX = e.touches[0].clientX;
-    }, { passive: true });
-
-    window.addEventListener('touchend', () => {
-      isDragging = false;
-    });
-
-    // Animation Loop
-    const updateRotation = () => {
-      if (!isDragging && !isHovered) {
-        targetAngle -= autoRotateSpeed; // Continuous spin
-      }
-      
-      // Smoothly interpolate to target angle
-      currentAngle += (targetAngle - currentAngle) * 0.1;
-      ring.style.transform = `rotateY(${currentAngle}deg)`;
-      
-      requestAnimationFrame(updateRotation);
+    const resizeNetwork = () => {
+      const parent = netCanvas.parentElement;
+      netCanvas.width = parent.clientWidth;
+      netCanvas.height = parent.clientHeight;
+      initNetwork();
     };
 
-    wrapper.style.cursor = 'grab';
-    updateRotation();
-  }
+    // Initialize random nodes (servers/targets)
+    const initNetwork = () => {
+      nodes = [];
+      packets = [];
+      scanLineY = 0;
+      
+      const numNodes = window.innerWidth < 768 ? 40 : 80;
+      
+      for (let i = 0; i < numNodes; i++) {
+        nodes.push({
+          x: Math.random() * netCanvas.width,
+          y: Math.random() * netCanvas.height,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          radius: Math.random() * 2 + 1,
+          glow: 0, // Glow level when scanned or active
+          connections: []
+        });
+      }
 
+      // Establish connections between nearby nodes
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 120 && nodes[i].connections.length < 4) {
+            nodes[i].connections.push(nodes[j]);
+            nodes[j].connections.push(nodes[i]);
+          }
+        }
+      }
+
+      const countEl = document.getElementById('nodeCount');
+      if (countEl) countEl.textContent = nodes.length;
+    };
+
+    // Class for data packets moving along lines
+    class DataPacket {
+      constructor(startNode, endNode) {
+        this.start = startNode;
+        this.end = endNode;
+        this.progress = 0;
+        this.speed = 0.01 + Math.random() * 0.02;
+        this.active = true;
+      }
+      update() {
+        this.progress += this.speed;
+        if (this.progress >= 1) {
+          this.active = false;
+          this.end.glow = 1; // Destination lights up upon packet arrival
+        }
+      }
+      draw() {
+        if (!this.active) return;
+        const currentX = this.start.x + (this.end.x - this.start.x) * this.progress;
+        const currentY = this.start.y + (this.end.y - this.start.y) * this.progress;
+        
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#00ff88';
+        ctx.fill();
+        ctx.shadowBlur = 0; // reset
+      }
+    }
+
+    const animateNetwork = () => {
+      if (!isNetVisible) return;
+      
+      ctx.clearRect(0, 0, netCanvas.width, netCanvas.height);
+      
+      // Update nodes
+      nodes.forEach(node => {
+        node.x += node.vx;
+        node.y += node.vy;
+        
+        // Bounce off edges
+        if (node.x <= 0 || node.x >= netCanvas.width) node.vx *= -1;
+        if (node.y <= 0 || node.y >= netCanvas.height) node.vy *= -1;
+
+        // Decay glow
+        if (node.glow > 0) node.glow -= 0.02;
+        if (node.glow < 0) node.glow = 0;
+      });
+
+      // Draw Connection Lines
+      ctx.lineWidth = 0.5;
+      nodes.forEach(node => {
+        node.connections.forEach(target => {
+          const dx = node.x - target.x;
+          const dy = node.y - target.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 150) {
+            // Line becomes brighter if either connected node is glowing
+            const lineAlpha = 0.05 + (node.glow + target.glow) * 0.2;
+            ctx.strokeStyle = `rgba(0, 255, 136, ${lineAlpha})`;
+            ctx.beginPath();
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(target.x, target.y);
+            ctx.stroke();
+          }
+        });
+      });
+
+      // Spawn Data Packets randomly
+      if (Math.random() < 0.08) {
+        const startNode = nodes[Math.floor(Math.random() * nodes.length)];
+        if (startNode.connections.length > 0) {
+          const endNode = startNode.connections[Math.floor(Math.random() * startNode.connections.length)];
+          packets.push(new DataPacket(startNode, endNode));
+        }
+      }
+
+      // Draw Packets
+      for (let i = packets.length - 1; i >= 0; i--) {
+        packets[i].update();
+        packets[i].draw();
+        if (!packets[i].active) packets.splice(i, 1);
+      }
+
+      // Draw Nodes
+      nodes.forEach(node => {
+        ctx.beginPath();
+        const currentRadius = node.radius + node.glow * 2;
+        ctx.arc(node.x, node.y, currentRadius, 0, Math.PI * 2);
+        
+        if (node.glow > 0) {
+          ctx.fillStyle = `rgba(0, 255, 136, ${0.4 + node.glow * 0.6})`;
+          ctx.shadowBlur = 15 * node.glow;
+          ctx.shadowColor = '#00ff88';
+        } else {
+          ctx.fillStyle = 'rgba(0, 255, 136, 0.3)';
+          ctx.shadowBlur = 0;
+        }
+        ctx.fill();
+
+        // Draw tactical square around glowing nodes
+        if (node.glow > 0.5) {
+          ctx.strokeStyle = `rgba(0, 255, 136, ${node.glow})`;
+          ctx.lineWidth = 1;
+          const s = currentRadius + 4;
+          ctx.strokeRect(node.x - s, node.y - s, s * 2, s * 2);
+        }
+      });
+
+      // Update and Draw Horizontal Radar Scanline
+      scanLineY += 2;
+      if (scanLineY > netCanvas.height + 100) scanLineY = -50; // loop back
+
+      // Light up nodes hit by the scanline
+      nodes.forEach(node => {
+        if (Math.abs(node.y - scanLineY) < 5) {
+          node.glow = 1.0;
+        }
+      });
+
+      // Draw scanline glow
+      const scanGrad = ctx.createLinearGradient(0, scanLineY - 20, 0, scanLineY);
+      scanGrad.addColorStop(0, 'rgba(0, 255, 136, 0)');
+      scanGrad.addColorStop(1, 'rgba(0, 255, 136, 0.4)');
+      ctx.fillStyle = scanGrad;
+      ctx.fillRect(0, scanLineY - 20, netCanvas.width, 20);
+
+      ctx.strokeStyle = 'rgba(0, 255, 136, 0.8)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, scanLineY);
+      ctx.lineTo(netCanvas.width, scanLineY);
+      ctx.stroke();
+
+      netFrame = requestAnimationFrame(animateNetwork);
+    };
+
+    // Setup and Listeners
+    resizeNetwork();
+
+    let netResizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(netResizeTimer);
+      netResizeTimer = setTimeout(() => {
+        if (isNetVisible) resizeNetwork();
+      }, 250);
+    });
+
+    if ('IntersectionObserver' in window) {
+      const netObserver = new IntersectionObserver(([entry]) => {
+        isNetVisible = entry.isIntersecting;
+        if (isNetVisible) {
+          if (!netFrame) animateNetwork();
+        } else {
+          cancelAnimationFrame(netFrame);
+          netFrame = null;
+        }
+      }, { threshold: 0.1 });
+      netObserver.observe(projSection);
+    }
+  }
 });
